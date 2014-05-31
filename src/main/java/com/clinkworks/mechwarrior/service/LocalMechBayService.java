@@ -63,5 +63,11 @@ public class LocalMechBayService implements MechBayService {
 	public MechBay getMechBay(){
 		return smurfyMechData.getMechBay();
 	}
+
+	@Override
+	public Mech getMechWithSpecificLoadout(int mechId, String loadoutId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

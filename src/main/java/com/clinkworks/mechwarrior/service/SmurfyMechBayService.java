@@ -27,6 +27,14 @@ public class SmurfyMechBayService implements MechBayService{
 		return mech;
 	}
 
+	@Override 
+	public Mech getMechWithSpecificLoadout(int mechId, String loadoutId){
+		Loadout loadout = mechData.getLoadoutForChassisId(loadoutId, mechId);
+		Mech mech = mechData.getChassisDetailsForSpecificChassisId(mechId);
+		mech.setLoadout(loadout);
+		return mech;
+	}
+	
 	@Override
 	public Mechs getAllMechs() {
 		return mechData.getDetailsForAllChassis();

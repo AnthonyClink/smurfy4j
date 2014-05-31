@@ -12,4 +12,6 @@ public interface MechBayService {
 
 	public abstract MechBay getMechBay();
 
+	public abstract Mech getMechWithSpecificLoadout(int mechId, String loadoutId);
+
 }
