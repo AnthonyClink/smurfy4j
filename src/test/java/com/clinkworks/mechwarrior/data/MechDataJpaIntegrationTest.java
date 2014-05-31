@@ -1,0 +1,33 @@
+package com.clinkworks.mechwarrior.data;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.clinkworks.mechwarrior.modules.MechwarriorModule;
+import com.clinkworks.mechwarrior.service.LocalMechBayService;
+import com.clinkworks.neptical.junit.runners.NepticalJUnit4Runner;
+import com.clinkworks.neptical.junit.runners.NepticalJUnit4Runner.NepticalConfiguration;
+import com.google.inject.persist.PersistService;
+
+@RunWith(NepticalJUnit4Runner.class)
+@NepticalConfiguration({MechwarriorModule.class})
+public class MechDataJpaIntegrationTest {
+	
+	@Before
+	public void setup(PersistService persistService){
+		persistService.start();
+		System.out.println("First");
+	}
+	
+	@Test
+	public void canCommitAComponentWithOneItem(LocalMechBayService mechBayService){
+		mechBayService.saveComponent(Mocks.getHeadComponentWithSmallLaser());
+	}
+	
+	@Test
+	public void canCommitAnItem(LocalMechBayService mechBayService){
+		mechBayService.saveItem(Mocks.getSmallLaserItem());
+	}
+
+}
