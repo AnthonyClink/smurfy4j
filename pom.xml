@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.clinkworks.games</groupId>
   <artifactId>smurfy4j</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>Smurfy4J</name>
   <description>A java based smurfy client, additionally serving some additional clinkworks specific features</description>
   <packaging>jar</packaging>
@@ -19,7 +19,21 @@
   	</properties>
  
   <dependencies>
-      
+ 	
+ 	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-log4j12</artifactId>
+		<version>1.7.7</version>
+		<scope>compiled</scope>
+	</dependency>
+	
+	    <dependency>
+		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+		<version>1.2.17</version>
+		<scope>provided</scope>
+	</dependency>
+	     
        <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
@@ -153,18 +167,6 @@
 	    <groupId>com.sun.xml.bind</groupId>
 	    <artifactId>jaxb-impl</artifactId>
 	    <version>${jaxb.version}</version>
-	</dependency>
-    
-    <dependency>
-		<groupId>log4j</groupId>
-		<artifactId>log4j</artifactId>
-		<version>1.2.17</version>
-	</dependency>
-
-	<dependency>
-		<groupId>org.slf4j</groupId>
-		<artifactId>slf4j-log4j12</artifactId>
-		<version>1.5.8</version>
 	</dependency>
 
 

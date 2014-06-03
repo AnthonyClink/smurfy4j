@@ -1,14 +1,29 @@
 package com.clinkworks.mechwarrior.datatype;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
+@Entity
 public class Mech {
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	
 	private MechType mech_type;
 	private String family;
 	private String name;
 	private String translated_name;
 	private String translated_short_name;
+	
+	@Transient
 	private MechDetails details;
+	
+	@OneToOne
 	private Loadout loadout;
 	
 	public int getId() {

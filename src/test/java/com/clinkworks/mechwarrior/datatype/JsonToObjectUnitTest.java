@@ -21,7 +21,7 @@ public class JsonToObjectUnitTest {
 	
 	@Before
 	public void setup(){
-		hunchback = Mocks.hunchback4GStockLoadout();
+		hunchback = Mocks.hunchback4GStockLoadoutJson();
 		hunchbackDetails = Mocks.hunchback4GChassis();
 	}
 	

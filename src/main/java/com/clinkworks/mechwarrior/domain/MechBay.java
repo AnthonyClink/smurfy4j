@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.clinkworks.mechwarrior.datatype.Mech;
+import com.google.inject.Inject;
 
 public class MechBay {
 	
 	private Map<Serializable, Mech> mechs;
 
+	@Inject
 	public MechBay(Map<Serializable, Mech> mechs){
 		this.mechs = mechs;
 	}

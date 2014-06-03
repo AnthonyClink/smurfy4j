@@ -10,6 +10,7 @@ import com.clinkworks.mechwarrior.datatype.Loadout;
 import com.clinkworks.mechwarrior.datatype.Mech;
 import com.clinkworks.mechwarrior.datatype.Mechs;
 import com.clinkworks.mechwarrior.domain.MechBay;
+import com.clinkworks.mechwarrior.domain.User;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -60,14 +61,25 @@ public class LocalMechBayService implements MechBayService {
 	 * @see com.clinkworks.mechwarrior.service.MechBayService#getMechBay()
 	 */
 	@Override
-	public MechBay getMechBay(){
-		return smurfyMechData.getMechBay();
+	public MechBay getMechBay(User user){
+		return smurfyMechData.getMechBay(user.getSmurfyApiKey());
+	}
+	
+	@Override
+	public MechBay getMechBay(String smurfyApiKey){
+		return smurfyMechData.getMechBay(smurfyApiKey);
 	}
 
 	@Override
 	public Mech getMechWithSpecificLoadout(int mechId, String loadoutId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+
+	@Transactional
+	public void saveMech(Mech mech) {
+		localMechData.saveMech(mech);
 	}
 	
 }

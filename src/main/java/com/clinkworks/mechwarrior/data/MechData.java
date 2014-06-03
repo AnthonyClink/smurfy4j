@@ -13,7 +13,7 @@ public interface MechData {
 
 	public abstract Loadout getLoadoutForChassisId(String loadoutId,
 			int chassisId);
-
-	public abstract MechBay getMechBay();
+	
+	public abstract MechBay getMechBay(String smurfyApiKey);
 
 }

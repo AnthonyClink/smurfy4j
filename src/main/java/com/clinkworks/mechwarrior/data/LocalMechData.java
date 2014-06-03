@@ -23,19 +23,82 @@ public class LocalMechData implements MechData{
 	}
 	
 	public void saveItem(Item item){
-		EntityManager entityManager = entityManagerProvider.get();
-		entityManager.persist(item);
-		entityManager.merge(item);
+		saveOrMerge(item);
+		entityManagerProvider.get().flush();
 	}
 	
 	public void saveComponent(Component component){
 		EntityManager entityManager = entityManagerProvider.get();
+		
 		for(Item item : component.getItems()){
-			saveItem(item);
+			saveOrMerge(item);
 		}
-		entityManager.merge(component);
+		
+		saveOrMerge(component);
+		entityManager.flush();
 	}
-	     
+	    
+	public void saveLoadout(Loadout loadout){
+		
+		for(Component component : loadout.getConfiguration()){
+			component.setLoadoutId(loadout.getSmurfyId());
+			saveComponent(component);
+		}
+		
+		for(Item upgrade : loadout.getUpgrades()){
+			saveItem(upgrade);
+		}
+		
+		saveOrMerge(loadout);
+	}
+	
+	private void saveOrMerge(Loadout loadout){
+		EntityManager entityManager = entityManagerProvider.get();
+		
+		if(entityManager.contains(loadout)){
+			return;
+		}
+		
+		if(loadout.getClinkworksId() == null){
+			entityManager.persist(loadout);
+			entityManager.merge(loadout);
+			entityManager.flush();
+		}
+		
+		
+		if(!entityManager.contains(loadout)){
+			entityManager.merge(loadout);
+		}		
+	}
+	
+	public void saveMech(Mech mech) {
+		EntityManager entityManager = entityManagerProvider.get();
+		Loadout loadout = mech.getLoadout();
+		loadout.setMechId(mech.getId());
+		saveLoadout(loadout);
+		saveOrMerge(mech);
+		entityManager.flush();
+	}
+	
+	private void saveOrMerge(Mech mech) {
+		EntityManager entityManager = entityManagerProvider.get();
+		
+		if(entityManager.contains(mech)){
+			return;
+		}
+		
+		Mech foundMech = entityManager.find(Mech.class, mech.getId());
+		
+		if(foundMech == null){
+			entityManager.merge(foundMech);
+		}
+		
+		if(!entityManager.contains(mech)){
+			entityManager.merge(mech);
+		}		
+		
+	}
+
 	@Override
 	public Mechs getDetailsForAllChassis() {
 		return null;
@@ -51,11 +114,52 @@ public class LocalMechData implements MechData{
 		return null;
 	}
 
-
 	@Override
-	public MechBay getMechBay() {
+	public MechBay getMechBay(String smurfyApiKey) {
 		return null;
 	}
 
-
+	private void saveOrMerge(Item item){
+		EntityManager entityManager = entityManagerProvider.get();
+		
+		if(entityManager.contains(item)){
+			return;
+		}
+		
+		Item foundItem = entityManager.find(Item.class, item.getId());
+		
+		if(foundItem == null){
+			entityManager.persist(item);
+			entityManager.merge(item);
+		}
+		
+		if(!entityManager.contains(foundItem)){
+			entityManager.merge(item);
+		}else{
+			entityManager.flush();
+		}
+		
+	}
+	
+	public void saveOrMerge(Component component){
+		
+		EntityManager entityManager = entityManagerProvider.get();
+		
+		if(entityManager.contains(component)){
+			return;
+		}
+		
+		Component foundComponent = entityManager.find(Component.class, component.getId());
+		
+		if(foundComponent == null){
+			entityManager.persist(component);
+			entityManager.merge(component);
+			foundComponent = component;
+		}
+		
+		if(!entityManager.contains(component)){
+			entityManager.merge(component);
+		}
+		
+	}
 }

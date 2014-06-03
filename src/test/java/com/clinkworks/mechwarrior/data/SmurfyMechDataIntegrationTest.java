@@ -5,15 +5,19 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.clinkworks.mechwarrior.modules.MechDataModule.SmurfyDataModule;
-import com.clinkworks.mechwarrior.modules.PropertiesModule;
+import com.clinkworks.mechwarrior.modules.MechwarriorModule;
 import com.clinkworks.neptical.junit.runners.NepticalJUnit4Runner;
 import com.clinkworks.neptical.junit.runners.NepticalJUnit4Runner.NepticalConfiguration;
 import com.google.gson.JsonObject;
 
 @RunWith(NepticalJUnit4Runner.class)
-@NepticalConfiguration({PropertiesModule.class, SmurfyDataModule.class})
+@NepticalConfiguration({MechwarriorModule.class})
 public class SmurfyMechDataIntegrationTest {
+		
+	@Test
+	public void canRetrieveClinkworksUserNameFromSmurfy(SmurfyMechData mechData){
+		assertEquals("clinkworks", mechData.getSmurfyUserName(mechData.getDefaultApiKey()));
+	}
 	
 	@Test	
 	public void ensureWeCanRetreieveAllMechDataFromSmurfy(SmurfyMechData mechData){
@@ -25,9 +29,11 @@ public class SmurfyMechDataIntegrationTest {
 	
 	@Test
 	public void ensureWeCanGetMechbayData(SmurfyMechData mechData){
-		JsonObject mechBayJson = mechData.getMechbayJson();
-		assertNotNull(mechBayJson.get("1"));
-		assertNotNull(mechBayJson.get("1").getAsJsonObject().get("name").getAsString());
+		//TODO: report api inconsistancy to smurfy. This method returns an empty array when theres no results.
+		//but returns an object thats "arraylike". 
+		//some best practice research will need to be done.
+		JsonObject mechBayJson = mechData.getMechbayJson(mechData.getDefaultApiKey());
+		assertNotNull(mechBayJson);
 	}
 	
 	@Test

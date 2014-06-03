@@ -1,22 +1,27 @@
 package com.clinkworks.mechwarrior.service;
 
+import com.clinkworks.mechwarrior.authentication.AuthenticationService;
 import com.clinkworks.mechwarrior.data.MechData;
 import com.clinkworks.mechwarrior.data.SmurfyMechData;
 import com.clinkworks.mechwarrior.datatype.Loadout;
 import com.clinkworks.mechwarrior.datatype.Mech;
 import com.clinkworks.mechwarrior.datatype.Mechs;
 import com.clinkworks.mechwarrior.domain.MechBay;
+import com.clinkworks.mechwarrior.domain.User;
+import com.clinkworks.mechwarrior.exception.SmurfyAuthorizationException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class SmurfyMechBayService implements MechBayService{
 	
-	private MechData mechData;
+	private final MechData mechData;
+	private final AuthenticationService authenticationService;
 	
 	@Inject
-	public SmurfyMechBayService(SmurfyMechData mechData){
+	public SmurfyMechBayService(SmurfyMechData mechData, AuthenticationService authenticationService){
 		this.mechData = mechData;
+		this.authenticationService = authenticationService;
 	}
 	
 	@Override
@@ -40,9 +45,21 @@ public class SmurfyMechBayService implements MechBayService{
 		return mechData.getDetailsForAllChassis();
 	}
 
+
 	@Override
-	public MechBay getMechBay() {
-		return mechData.getMechBay();
+	public MechBay getMechBay(String smurfyApiKey) {
+		if(!authenticationService.authenticateSmurfyAccess(smurfyApiKey)){
+			throw new SmurfyAuthorizationException(smurfyApiKey);
+		}		
+		return mechData.getMechBay(smurfyApiKey);
+	}
+	
+	@Override
+	public MechBay getMechBay(User user) {
+		if(!user.isSmurfyAuthenticated()){
+			throw new SmurfyAuthorizationException(user.getSmurfyApiKey());
+		}
+		return mechData.getMechBay(user.getSmurfyApiKey());
 	}
 
 

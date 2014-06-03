@@ -28,21 +28,38 @@ import com.sun.jersey.api.client.ClientRequest;
 @Singleton
 public class SmurfyMechData implements MechData {
 	
-	private final URI SMURFY_GET_ALL_CHASSIS_GENERIC = URI.create("http://mwo.smurfy-net.de/api/data/mechs.json");
+	private static final String AUTH_HEADER_VALUE_IDENTITY = "APIKEY ";
+	
+	private final URI SMURFY_USER_GET_URI = URI.create("https://mwo.smurfy-net.de/api/data/user/details.json");
+	
+	private final URI SMURFY_GET_ALL_CHASSIS_GENERIC_URI = URI.create("http://mwo.smurfy-net.de/api/data/mechs.json");
 	private final URI SMURFY_GET_MECHBAY_URI = URI.create("https://mwo.smurfy-net.de/api/data/user/mechbay.json");
 	
 	private final String SMURFY_GET_SPECIFIC_CHASSIS_URI_TEMPLATE = "http://mwo.smurfy-net.de/api/data/mechs/%s.json";
 	private final String SMURFY_GET_LOADOUT_URI_TEMPLATE = "http://mwo.smurfy-net.de/api/data/mechs/%s/loadouts/%s.json";
 	
 	private final Client jerseyClient;
-	private final String apiKey;
+	
+	//used for non auth required calls to smurfy
+	private final String defaultApiKey;
 	
 	@Inject
-	public SmurfyMechData(Client jerseyClient, @Named("smurfy.access.token") String apiKey){
+	public SmurfyMechData(Client jerseyClient, @Named("default.smurfy.api.key") String apiKey){
 		this.jerseyClient = jerseyClient;
-		this.apiKey = apiKey;
+		this.defaultApiKey = apiKey;
 	}
 
+	public String getSmurfyUserName(String apiKey){
+		try{
+			JsonObject userObject = handle(smurfyGetWithAuthorization(userURI(), apiKey), JsonObject.class);
+			return userObject.get("username").getAsString();
+		}catch(JsonSyntaxException e){
+			//log exception... logging strategy to yet be determined..
+			//TODO: handle this exception
+			return null;
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.clinkworks.mechwarrior.data.MechData#getDetailsForAllChassis()
 	 */
@@ -94,11 +111,11 @@ public class SmurfyMechData implements MechData {
 	 * @see com.clinkworks.mechwarrior.data.MechData#getMechbay()
 	 */
 	@Override
-	public MechBay getMechBay(){
+	public MechBay getMechBay(String smurfyApiKey){
 		
 		Map<Serializable, Mech> mechs = Maps.newHashMap();
 		MechBay mechBay = new MechBay(mechs);
-		JsonObject mechJson = getMechbayJson();
+		JsonObject mechJson = getMechbayJson(smurfyApiKey);
 		
 		for(Map.Entry<String, JsonElement> entry : mechJson.entrySet()) {
 			
@@ -134,12 +151,27 @@ public class SmurfyMechData implements MechData {
 		return handle(smurfyGet(loadoutForIdUri(chassisId, loadoutId)), JsonObject.class);
 	}
 	
-	public JsonObject getMechbayJson(){
-		return handle(smurfyGet(mechbayURI()), JsonObject.class);
+	public JsonObject getMechbayJson(String smurfyApiKey){
+		
+		JsonElement mechBay = handle(smurfyGetWithAuthorization(mechbayURI(), smurfyApiKey), JsonElement.class);
+		
+		if(mechBay.isJsonObject()){
+			return mechBay.getAsJsonObject();
+		}
+		
+		//smurfy is generally used by untyped langauges making the transision between array and object
+		//much easier that it is in java.
+		//to ensure \"java\" type correctness we will return an empty object instead of the empty array returned by smurfy
+		//personally I think GSON should treat arraylike (ecmascript specification) objects as arrays.
+		return new JsonObject();
 	}
 		
+	public String getDefaultApiKey(){
+		return defaultApiKey;
+	}
+	
 	private URI smurfyGetAllURI(){
-		return SMURFY_GET_ALL_CHASSIS_GENERIC;
+		return SMURFY_GET_ALL_CHASSIS_GENERIC_URI;
 	}
 	
 	private URI specificChassisUri(int id){
@@ -154,13 +186,22 @@ public class SmurfyMechData implements MechData {
 			);
 	}
 	
+	private URI userURI(){
+		return SMURFY_USER_GET_URI;
+	}
+	
 	private URI mechbayURI(){
 		return SMURFY_GET_MECHBAY_URI;
 	}
 	
 	private ClientRequest smurfyGet(URI uri){
+		return smurfyGetWithAuthorization(uri, defaultApiKey);
+	}
+	
+	private ClientRequest smurfyGetWithAuthorization(URI uri, String authorizationToken){
+		authorizationToken = AUTH_HEADER_VALUE_IDENTITY + authorizationToken;
 		return ClientRequest.create().
-				header(MechDataModule.AUTHORIZATION_HEADER_NAME, apiKey).
+				header(MechDataModule.AUTHORIZATION_HEADER_NAME, authorizationToken).
 				build(uri, HttpMethod.GET);		
 	}
 	

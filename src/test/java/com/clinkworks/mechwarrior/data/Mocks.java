@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.clinkworks.mechwarrior.datatype.Component;
 import com.clinkworks.mechwarrior.datatype.Item;
+import com.clinkworks.mechwarrior.datatype.Loadout;
 import com.clinkworks.mechwarrior.datatype.Mech;
 import com.clinkworks.mechwarrior.domain.MechBay;
 import com.clinkworks.neptical.util.JsonUtil;
@@ -22,7 +23,7 @@ public class Mocks {
 		return new MechBay(mechs);
 	}
 
-	public static final JsonObject hunchback4GStockLoadout(){
+	public static final JsonObject hunchback4GStockLoadoutJson(){
 		return JsonUtil.parse(HUNCHBACK_4G_STOCK_LOADOUT_JSON).getAsJsonObject();
 	}
 	
@@ -40,6 +41,13 @@ public class Mocks {
 	
 	public static final Component getHeadComponentWithSmallLaser(){
 		return JsonUtil.toObject(Component.class, "{\"name\":\"head\",\"armor\":18,\"items\":[{\"id\":\"1003\",\"type\":\"weapon\",\"name\":\"SMALL LASER\"}]}");
+	}
+	
+	public static final Mech hunchback4GStockLoadoutMech(){
+		Loadout loadout = JsonUtil.toObject(Loadout.class, hunchback4GStockLoadoutJson());
+		Mech mech = JsonUtil.toObject(Mech.class, hunchback4GChassis());
+		mech.setLoadout(loadout);
+		return mech;
 	}
 	
 	public static final Item getSmallLaserItem(){

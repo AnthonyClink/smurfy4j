@@ -7,6 +7,7 @@ import mockit.Mocked;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.clinkworks.mechwarrior.authentication.AuthenticationService;
 import com.clinkworks.mechwarrior.data.Mocks;
 import com.clinkworks.mechwarrior.data.SmurfyMechData;
 import com.clinkworks.mechwarrior.datatype.Loadout;
@@ -20,9 +21,12 @@ public class MechbayServiceUnitTest {
 	@Mocked
 	private SmurfyMechData mechData;
 	
+	@Mocked
+	private AuthenticationService authenticationService;
+	
 	@Before
 	public void setup(){
-		mechbayService = new SmurfyMechBayService(mechData);
+		mechbayService = new SmurfyMechBayService(mechData, authenticationService);
 	}
 	
 	@Test
@@ -48,12 +52,16 @@ public class MechbayServiceUnitTest {
 	public void ensureServiceCanReturnTheMechbay(){
 		
 		new Expectations(){{
-			mechData.getMechBay();
+			authenticationService.authenticateSmurfyAccess(anyString);
+			result = true;
+			times = 1;
+			
+			mechData.getMechBay(anyString);
 			result = Mocks.emptyMechBay();
 			times = 1;
 		}};
 		
-		MechBay mechBay = mechbayService.getMechBay();
+		MechBay mechBay = mechbayService.getMechBay("API-KEY");
 		
 		assertEquals(0, mechBay.getTotalMechs());
 	

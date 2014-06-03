@@ -15,7 +15,9 @@
 				<class>com.clinkworks.mechwarrior.datatype.Loadout</class>	
 				<class>com.clinkworks.mechwarrior.datatype.Mech</class>	
 				<class>com.clinkworks.mechwarrior.datatype.Mechs</class>	
-
+				<class>com.clinkworks.mechwarrior.datatype.UserDetails</class>
+				<class>com.clinkworks.mechwarrior.datatype.Price</class>
+				<class>com.clinkworks.mechwarrior.datatype.MechDetails</class>
         <properties>
 
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
